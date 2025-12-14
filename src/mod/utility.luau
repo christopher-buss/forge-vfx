@@ -403,8 +403,6 @@ function utility.getTransformedOriginExtents(parent: Instance)
       if newParent:IsA("BasePart") and positionScale ~= vector.zero then
         local offset = (newParent.Size / 2) * positionScale
         originCFrame = originCFrame + offset
-      elseif newParent:IsA("Attachment") then
-        originCFrame = utility.getTransformedOriginExtents(newParent)
       end
     end
 
