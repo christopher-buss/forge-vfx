@@ -23,8 +23,8 @@ function particle.emit(ref: ParticleEmitter, obj: ParticleEmitter, scope: types.
 
   local timeScaleDuration = utility.getAttribute(ref, "TimeScale_Duration", 0.1)
 
-  local timeScaleStart = utility.getAttribute(ref, "TimeScale_Start", obj.TimeScale)
-  local timeScaleEnd = utility.getAttribute(ref, "TimeScale_End", obj.TimeScale)
+  local timeScaleStart = utility.getAttribute(ref, "TimeScale_Start", obj.TimeScale, true)
+  local timeScaleEnd = utility.getAttribute(ref, "TimeScale_End", obj.TimeScale, true)
 
   local speedTween
 
@@ -42,7 +42,7 @@ function particle.emit(ref: ParticleEmitter, obj: ParticleEmitter, scope: types.
     )
 
     table.insert(scope, speedTween)
-  elseif timeScaleStart ~= 1 then
+  elseif timeScaleStart ~= obj.TimeScale then
     obj.TimeScale = timeScaleStart
   end
 
