@@ -24,6 +24,7 @@ utility.ENABLED_VFX_TAG = "ConstantVFX"
 utility.TEXTURE_LOAD_TAG = "LoadVFXTextures"
 
 utility.CLEANUP_TAG = "__forge__cleanupOnExit"
+utility.EMIT_EXCLUDE_TAG = "__forge_excludeFromEmit"
 
 utility.RENDER_PRIORITY = Enum.RenderPriority.Camera.Value + 1
 

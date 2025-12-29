@@ -82,7 +82,7 @@ function effects.emit(depth: number, ...: Instance): types.EmitEnv
       local parent = desc.Parent
 
       while parent and parent ~= obj do
-        if nestedEffectHandlers[parent] then
+        if nestedEffectHandlers[parent] or parent:HasTag(utility.EMIT_EXCLUDE_TAG) then
           skipThis = true
           break
         end

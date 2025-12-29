@@ -86,8 +86,11 @@ function emitters.beam(obj: Beam, scope: types.scope, legacyScale: number)
     table.insert(scope, a)
     table.insert(scope, b)
 
-    a.Name = "ForgeTempAttachment"
-    b.Name = "ForgeTempAttachment"
+    a.Name = "_ForgeTempAttachment"
+    b.Name = "_ForgeTempAttachment"
+
+    a:AddTag(utility.EMIT_EXCLUDE_TAG)
+    b:AddTag(utility.EMIT_EXCLUDE_TAG)
 
     clone.Attachment0 = a
     clone.Attachment1 = b
