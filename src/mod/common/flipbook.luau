@@ -45,11 +45,11 @@ function common.getTexturePrefix(ref: Instance)
 end
 
 function common.getFlipbookData(ref: Instance): { number }?
-  if not ref:GetAttribute("Flipbook_Enabled") then
+  if not ref:GetAttribute("FlipbookEnabled") then
     return nil
   end
 
-  local data = ref:GetAttribute("Flipbook_Textures")
+  local data = ref:GetAttribute("FlipbookTextures")
 
   if not data then
     return nil
