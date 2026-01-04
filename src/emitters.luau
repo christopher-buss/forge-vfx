@@ -40,25 +40,26 @@ function emitters.particle(
       return
     end
 
-    table.insert(scope, ancestor)
-
     local clone = obj:Clone()
     clone.Archivable = false
     clone.Parent = parent
 
     if not sharedUncMap[ancestor] then
       ancestor.Parent = workspace.Terrain
-    end
-
-    if not sharedUncMap[ancestor] then
       sharedUncMap[ancestor] = 1
     else
       sharedUncMap[ancestor] += 1
     end
 
-    utility.try(`failed to emit particle with error: %s`, Particle.emit, obj, clone, scope, legacyScale)
+    table.insert(scope, function()
+      sharedUncMap[ancestor] -= 1
 
-    sharedUncMap[ancestor] -= 1
+      if sharedUncMap[ancestor] <= 0 then
+        ancestor:Destroy()
+      end
+    end)
+
+    utility.try(`failed to emit particle with error: %s`, Particle.emit, obj, clone, scope, legacyScale)
   else
     utility.try(`failed to emit particle with error: %s`, Particle.emit, obj, obj, scope, legacyScale)
   end
