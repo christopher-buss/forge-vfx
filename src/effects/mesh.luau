@@ -222,15 +222,10 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
   if goalCFrameOffset ~= CFrame.identity then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Part_CFrame_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          currentCFrame = CFrame.identity:Lerp(goalCFrameOffset, alpha)
-          return deltaTime * (attr.getState(ref, "SpeedOverride", currentSpeed))
-        end,
-        speedTween
-      )
+      tween.fromParams(attr.get(ref, "Part_CFrame_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        currentCFrame = CFrame.identity:Lerp(goalCFrameOffset, alpha)
+        return deltaTime * (attr.getState(ref, "SpeedOverride", currentSpeed))
+      end, speedTween)
     )
   end
 
@@ -273,24 +268,19 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
 
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Part_Size_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          local speed = attr.getState(ref, "SpeedOverride", currentSpeed)
+      tween.fromParams(attr.get(ref, "Part_Size_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        local speed = attr.getState(ref, "SpeedOverride", currentSpeed)
 
-          -- reduce size writes
-          if math.abs(alpha - lastSizeAlpha) < 0.005 then
-            return deltaTime * speed
-          end
-
-          lastSizeAlpha = alpha
-          obj.Size = sizeStart:Lerp(sizeEnd, alpha)
-
+        -- reduce size writes
+        if math.abs(alpha - lastSizeAlpha) < 0.005 then
           return deltaTime * speed
-        end,
-        speedTween
-      )
+        end
+
+        lastSizeAlpha = alpha
+        obj.Size = sizeStart:Lerp(sizeEnd, alpha)
+
+        return deltaTime * speed
+      end, speedTween)
     )
   else
     obj.Size = sizeStart
@@ -404,19 +394,14 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
       if from.Color3 ~= to.Color3 then
         table.insert(
           scope,
-          tween.fromParams(
-            attr.get(from, "Color_Curve", utility.default_bezier),
-            duration,
-            function(alpha, deltaTime)
-              local a = Oklab.fromSRGB(from.Color3)
-              local b = Oklab.fromSRGB(to.Color3)
+          tween.fromParams(attr.get(from, "Color_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+            local a = Oklab.fromSRGB(from.Color3)
+            local b = Oklab.fromSRGB(to.Color3)
 
-              decal.Color3 = Oklab.toSRGB(a:Lerp(b, alpha), true)
+            decal.Color3 = Oklab.toSRGB(a:Lerp(b, alpha), true)
 
-              return deltaTime * (attr.getState(ref, "SpeedOverride", currentSpeed))
-            end,
-            speedTween
-          )
+            return deltaTime * (attr.getState(ref, "SpeedOverride", currentSpeed))
+          end, speedTween)
         )
       end
 

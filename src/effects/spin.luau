@@ -50,14 +50,10 @@ function spin.emit(ref: Model, scope: types.scope)
   if scaleStart ~= scaleEnd then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Scale_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          ref:ScaleTo(utility.lerp(scaleStart, scaleEnd, alpha))
-          return deltaTime
-        end
-      )
+      tween.fromParams(attr.get(ref, "Scale_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        ref:ScaleTo(utility.lerp(scaleStart, scaleEnd, alpha))
+        return deltaTime
+      end)
     )
   else
     ref:ScaleTo(scaleStart)

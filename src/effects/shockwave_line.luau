@@ -128,28 +128,20 @@ function line.emit(origin: Attachment, ref: Part, scope: types.scope)
   if scaleStart ~= scaleEnd then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Scale_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          currentScale = utility.lerp(scaleStart, scaleEnd, alpha)
-          return deltaTime
-        end
-      )
+      tween.fromParams(attr.get(ref, "Scale_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        currentScale = utility.lerp(scaleStart, scaleEnd, alpha)
+        return deltaTime
+      end)
     )
   end
 
   if rateStart ~= rateEnd then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Rate_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          currentRate = utility.lerp(rateStart, rateEnd, alpha)
-          return deltaTime
-        end
-      )
+      tween.fromParams(attr.get(ref, "Rate_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        currentRate = utility.lerp(rateStart, rateEnd, alpha)
+        return deltaTime
+      end)
     )
   end
 

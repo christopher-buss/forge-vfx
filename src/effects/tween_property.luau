@@ -63,18 +63,10 @@ function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
 
   table.insert(
     scope,
-    tween.fromParams(
-      attr.get(obj, "Easing_Curve", utility.linear_bezier),
-      duration,
-      function(alpha, deltaTime)
-        parent[property] = lfunc(startValue, endValue, alpha)
-        return deltaTime * currentSpeed
-      end,
-      speedTween,
-      nil,
-      nil,
-      utility.RENDER_PRIORITY + scope.depth
-    )
+    tween.fromParams(attr.get(obj, "Easing_Curve", utility.linear_bezier), duration, function(alpha, deltaTime)
+      parent[property] = lfunc(startValue, endValue, alpha)
+      return deltaTime * currentSpeed
+    end, speedTween, nil, nil, utility.RENDER_PRIORITY + scope.depth)
   )
 
   if resetOnFinish then

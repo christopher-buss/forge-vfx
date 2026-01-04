@@ -7,20 +7,20 @@ local ATTR_CACHE_ID = "U"
 
 type AttrCache = {
   [number]: {
-    [string]: any
-  }
+    [string]: any,
+  },
 }
 
 type AttrHooks = {
   [Instance]: {
-    [string]: { (v: any) -> never }
-  }
+    [string]: { (v: any) -> never },
+  },
 }
 
 type RuntimeState = {
   [Instance]: {
-    [string]: any
-  }
+    [string]: any,
+  },
 }
 
 local Cache: AttrCache = {}

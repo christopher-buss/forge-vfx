@@ -272,12 +272,7 @@ function common.readCommonAttributes(ref: Attachment)
     projectileEnabled = attr.get(ref, "ProjectileEnabled", false),
     projectileMatchEnd = attr.get(ref, "MatchEndDirection", false),
     projectileSpeed = attr.get(ref, "ProjectileSpeed", 30),
-    projectileLifetime = attr.getRange(
-      ref,
-      "ProjectileLifetime",
-      NumberRange.new(1, 1),
-      NumberRange.new(0, math.huge)
-    ),
+    projectileLifetime = attr.getRange(ref, "ProjectileLifetime", NumberRange.new(1, 1), NumberRange.new(0, math.huge)),
 
     -- hitbox
     hitboxEnabled = attr.get(ref, "HitboxEnabled", false),

@@ -60,8 +60,7 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   local lengthScaleStart = rng:NextNumber(lengthScaleRangeStart.Min, lengthScaleRangeStart.Max)
 
   local tStart, tEnd =
-    attr.get(ref, "Transparency_Scale_Start", 1),
-    attr.get(ref, "Transparency_Scale_End", legacy_tpScale)
+    attr.get(ref, "Transparency_Scale_Start", 1), attr.get(ref, "Transparency_Scale_End", legacy_tpScale)
 
   local texSpeedStart = attr.get(ref, "Speed_Texture_Start", ref.TextureSpeed)
   local texSpeedEnd = attr.get(ref, "Speed_Texture_End", ref.TextureSpeed)
@@ -84,16 +83,12 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   table.insert(promises, env.Finished)
 
   if texSpeedStart ~= texSpeedEnd then
-    tween.fromParams(
-      attr.get(ref, "Speed_Texture_Curve", utility.default_bezier),
-      duration,
-      function(alpha, deltaTime)
-        baseTexSpeed = utility.lerp(texSpeedStart, texSpeedEnd, alpha)
-        obj.TextureSpeed = baseTexSpeed * currentSpeed
+    tween.fromParams(attr.get(ref, "Speed_Texture_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+      baseTexSpeed = utility.lerp(texSpeedStart, texSpeedEnd, alpha)
+      obj.TextureSpeed = baseTexSpeed * currentSpeed
 
-        return deltaTime
-      end
-    )
+      return deltaTime
+    end)
   end
 
   if speedStart ~= speedEnd then
@@ -209,18 +204,13 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   if lengthScaleStart ~= lengthScaleEnd then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Length_Scale_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          local x = utility.lerp(lengthScaleStart, lengthScaleEnd, alpha)
+      tween.fromParams(attr.get(ref, "Length_Scale_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        local x = utility.lerp(lengthScaleStart, lengthScaleEnd, alpha)
 
-          setLengthScale(x)
+        setLengthScale(x)
 
-          return deltaTime * currentSpeed
-        end,
-        speedTween
-      )
+        return deltaTime * currentSpeed
+      end, speedTween)
     )
   elseif texLengthStart ~= 1 then
     setLengthScale(lengthScaleStart)
@@ -229,15 +219,10 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   if w1 ~= w2 then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Width0_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          obj.Width0 = utility.lerp(w1, w2, alpha)
-          return deltaTime * currentSpeed
-        end,
-        speedTween
-      )
+      tween.fromParams(attr.get(ref, "Width0_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        obj.Width0 = utility.lerp(w1, w2, alpha)
+        return deltaTime * currentSpeed
+      end, speedTween)
     )
   else
     obj.Width0 = w1
@@ -246,15 +231,10 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   if w3 ~= w4 then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "Width1_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          obj.Width1 = utility.lerp(w3, w4, alpha)
-          return deltaTime * currentSpeed
-        end,
-        speedTween
-      )
+      tween.fromParams(attr.get(ref, "Width1_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        obj.Width1 = utility.lerp(w3, w4, alpha)
+        return deltaTime * currentSpeed
+      end, speedTween)
     )
   else
     obj.Width1 = w3
@@ -263,15 +243,10 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   if c1 ~= c2 then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "CurveSize0_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          obj.CurveSize0 = utility.lerp(c1, c2, alpha)
-          return deltaTime * currentSpeed
-        end,
-        speedTween
-      )
+      tween.fromParams(attr.get(ref, "CurveSize0_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        obj.CurveSize0 = utility.lerp(c1, c2, alpha)
+        return deltaTime * currentSpeed
+      end, speedTween)
     )
   else
     obj.Width0 = w1
@@ -280,15 +255,10 @@ function beam.emit(ref: Beam, obj: Beam, scope: types.scope, scale: number)
   if c3 ~= c4 then
     table.insert(
       scope,
-      tween.fromParams(
-        attr.get(ref, "CurveSize1_Curve", utility.default_bezier),
-        duration,
-        function(alpha, deltaTime)
-          obj.CurveSize1 = utility.lerp(c3, c4, alpha)
-          return deltaTime * currentSpeed
-        end,
-        speedTween
-      )
+      tween.fromParams(attr.get(ref, "CurveSize1_Curve", utility.default_bezier), duration, function(alpha, deltaTime)
+        obj.CurveSize1 = utility.lerp(c3, c4, alpha)
+        return deltaTime * currentSpeed
+      end, speedTween)
     )
   else
     obj.Width1 = w3
