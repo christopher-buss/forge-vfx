@@ -1,4 +1,5 @@
-local batch = require("@mod/tween_batch")
+local RunService = game:GetService("RunService")
+
 local logger = require("@mod/logger")
 local utility = require("@mod/utility")
 
@@ -28,20 +29,17 @@ function tween.fromParams(
       logger.error(`failed to decode bezier path data with error: {points}`)
     end
 
+    -- use 0 accuracy as it saves performance because there is no need to calculate the length
     bezier = Bezier.new(points, 0)
     bezierCache[params] = bezier
   end
 
   local elapsed = 0
-  local finished = false
 
-  local unregister
+  local cleanupStepper
 
-  local function step(deltaTime): boolean
-    if finished then
-      return true
-    end
-
+  local function step(deltaTime)
+    -- roblox tweens apparently don't start from alpha=0
     if not startAtZero and elapsed == 0 then
       elapsed = math.clamp(elapsed + deltaTime, 0, math.max(duration, 0))
     end
@@ -55,52 +53,48 @@ function tween.fromParams(
       (result == nil or (if duration ~= 0 then elapsed >= duration else elapsed > duration))
       and (not awaitTween or not awaitTween.Connected)
     then
-      finished = true
+      cleanupStepper()
 
       if onFinish then
         onFinish(true)
       end
 
-      return true
+      return
     end
 
     if result then
       elapsed = math.clamp(elapsed + result, 0, math.max(duration, 0.001))
     end
-
-    return false
   end
 
-  -- connection-like interface for compatibility
-  local handler = {}
-  handler.Connected = true
+  if not stepAtPriority then
+    local connection: RBXScriptConnection
+    connection = RunService.RenderStepped:Connect(step)
 
-  function handler:Disconnect()
-    if not handler.Connected then
-      return
+    cleanupStepper = function()
+      connection:Disconnect()
     end
 
-    finished = true
-    handler.Connected = false
+    return connection
+  else
+    local id = utility.getRandomId()
 
-    if unregister then
-      unregister()
-    end
-  end
+    RunService:BindToRenderStep(id, stepAtPriority, step)
 
-  unregister = batch.register(stepAtPriority, {
-    step = function(deltaTime): boolean
-      local done = step(deltaTime)
+    local bound = true
 
-      if done then
-        handler.Connected = false
+    cleanupStepper = function()
+      if not bound then
+        return
       end
 
-      return done
-    end,
-  })
+      bound = false
 
-  return handler
+      RunService:UnbindFromRenderStep(id)
+    end
+
+    return cleanupStepper
+  end
 end
 
 function tween.timer(
@@ -113,52 +107,52 @@ function tween.timer(
   local main = coroutine.running()
 
   local elapsed = 0
-  local finished = false
 
-  local unregister: (() -> ())?
+  local cleanupStepper
 
-  local function step(deltaTime): boolean
-    if finished then
-      return true
-    end
-
+  local function step(deltaTime)
     local result = counter(deltaTime, elapsed)
 
     if
       (result == nil or (if duration ~= 0 then elapsed >= duration else elapsed > duration))
       and (not awaitTween or not awaitTween.Connected)
     then
-      finished = true
+      cleanupStepper()
       task.spawn(main)
-
-      return true
+      return
     end
 
     if result then
       elapsed = math.clamp(elapsed + result, 0, math.max(duration, 0.001))
     end
-
-    return false
   end
 
-  unregister = batch.register(stepAtPriority, {
-    step = step,
-  })
+  if not stepAtPriority then
+    local connection = RunService.RenderStepped:Connect(step)
 
-  local cleanup = function()
-    if finished then
-      return
+    cleanupStepper = function()
+      connection:Disconnect()
     end
+  else
+    local id = utility.getRandomId()
 
-    finished = true
+    RunService:BindToRenderStep(id, stepAtPriority, step)
 
-    if unregister then
-      unregister()
+    local bound = true
+
+    cleanupStepper = function()
+      if not bound then
+        return
+      end
+
+      bound = false
+
+      RunService:UnbindFromRenderStep(id)
     end
   end
 
   if scope then
-    table.insert(scope, cleanup)
+    table.insert(scope, cleanupStepper)
   end
 
   coroutine.yield()
