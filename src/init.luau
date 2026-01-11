@@ -91,6 +91,7 @@ local logger = require("@mod/logger")
 local utility = require("@mod/utility")
 local attributes = require("@mod/attributes")
 
+local Sound = require("@vfx/sound")
 local Bezier = require("@vfx/bezier")
 local Lightning = require("@vfx/lightning")
 local CameraShake = require("@vfx/camera_shake")
@@ -163,6 +164,7 @@ function api.init(params: params?)
   enabled_effects.init(api.scope, api.caches.shared_part, effects)
 
   -- init effects
+  Sound.init()
   CameraShake.init()
 
   Bezier.init(api.caches.shared_part)
@@ -189,6 +191,7 @@ function api.deinit()
 
   effects.deinit()
 
+  Sound.deinit()
   Bezier.deinit()
   Lightning.deinit()
   CameraShake.deinit()

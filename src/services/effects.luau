@@ -8,6 +8,7 @@ local Promise = require("@pkg/Promise")
 local EffectSelectors = table.concat({
   "Beam",
   "Trail",
+  "Sound",
   "ParticleEmitter",
 
   -- Beziers
