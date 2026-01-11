@@ -1,12 +1,14 @@
 local Beam = require("@vfx/beam")
 local Spin = require("@vfx/spin")
 local Mesh = require("@vfx/mesh")
+local Sound = require("@vfx/sound")
 local Bezier = require("@vfx/bezier")
 local Screen = require("@vfx/screen")
 local Particle = require("@vfx/particle")
 local Lightning = require("@vfx/lightning")
 local CameraShake = require("@vfx/camera_shake")
-local TweenProperty = require("@vfx/tween_property")
+local Tweener = require("@vfx/tweener")
+local Randomizer = require("@vfx/randomizer")
 local ShockwaveRing = require("@vfx/shockwave_ring")
 local ShockwaveLine = require("@vfx/shockwave_line")
 local ShockwaveDebris = require("@vfx/shockwave_debris")
@@ -18,6 +20,28 @@ local utility = require("@mod/utility")
 local Promise = require("@pkg/Promise")
 
 local emitters = {}
+
+local function processRandomizers(obj: Instance, scope: types.scope)
+  local r_prop = obj:QueryDescendants(`> RayValue.{utility.PROPERTY_RANDOMIZER_TAG}`)
+  local r_attr = obj:QueryDescendants(`> RayValue.{utility.ATTRIBUTE_RANDOMIZER_TAG}`)
+
+  -- allow emitting the randomizer directly
+  if obj:IsA("RayValue") then
+    if obj:HasTag(utility.PROPERTY_RANDOMIZER_TAG) then
+      table.insert(r_prop, obj)
+    elseif obj:HasTag(utility.ATTRIBUTE_RANDOMIZER_TAG) then
+      table.insert(r_attr, obj)
+    end
+  end
+
+  for _, obj in r_prop do
+    utility.try(`failed to emit property randomizer with error: %s`, Randomizer.emit, obj, scope, false)
+  end
+
+  for _, obj in r_attr do
+    utility.try(`failed to emit attribute randomizer with error: %s`, Randomizer.emit, obj, scope, true)
+  end
+end
 
 function emitters.particle(
   obj: ParticleEmitter,
@@ -202,13 +226,21 @@ function emitters.camera_shake(obj: RayValue, scope: types.scope)
   utility.try(`failed to emit camera shake with error: %s`, CameraShake.emit, obj, scope)
 end
 
-function emitters.tween_property(obj: RayValue, scope: types.scope)
+function emitters.property_tweener(obj: RayValue, scope: types.scope)
   if not obj.Parent or utility.lock(obj) then
     return
   end
 
-  utility.try(`failed to emit tween property with error: %s`, TweenProperty.emit, obj.Parent, obj, scope)
+  utility.try(`failed to emit property tweener with error: %s`, Tweener.emit, obj, scope, false)
+  utility.unlock(obj)
+end
 
+function emitters.attribute_tweener(obj: RayValue, scope: types.scope)
+  if not obj.Parent or utility.lock(obj) then
+    return
+  end
+
+  utility.try(`failed to emit attribute tweener with error: %s`, Tweener.emit, obj.Parent, obj, scope, true)
   utility.unlock(obj)
 end
 
@@ -230,6 +262,16 @@ function emitters.shockwave_line(att: Attachment, obj: Part, scope: types.scope)
   utility.try(`failed to emit shockwave line with error: %s`, ShockwaveLine.emit, att, obj, scope)
 end
 
+function emitters.sound(obj: Sound, scope: types.scope)
+  local emitCount = attr.get(obj, "EmitCount", 1, true)
+
+  if emitCount <= 0 then
+    return
+  end
+
+  utility.try(`failed to emit sound with error: %s`, Sound.emit, obj, scope)
+end
+
 -- Dispatch function to determine which emitter to use and call it
 function emitters.dispatch(
   obj: any, -- since we don't use IsA(...), we don't get type narrowing
@@ -241,6 +283,8 @@ function emitters.dispatch(
 )
   local className = obj.ClassName
 
+  processRandomizers(obj, scope)
+
   if className == "ParticleEmitter" then
     emitters.particle(obj, scope, sharedUncMap, sharedRefMap, legacyScale)
     return
@@ -250,11 +294,19 @@ function emitters.dispatch(
   elseif className == "Trail" then
     emitters.trail(obj)
     return
+  elseif className == "Sound" then
+    emitters.sound(obj, scope)
+    return
   elseif className == "RayValue" then
     if obj:HasTag(utility.SCREENSHAKE_TAG) then
       emitters.camera_shake(obj, scope)
+    elseif obj:HasTag(utility.ATTRIBUTE_TWEENER_TAG) then
+      emitters.attribute_tweener(obj, scope)
+    elseif obj:HasTag(utility.PROPERTY_RANDOMIZER_TAG) or obj:HasTag(utility.ATTRIBUTE_RANDOMIZER_TAG) then
+      -- skip randomizer effects because they have already been emitted
     else
-      emitters.tween_property(obj, scope)
+      -- fall back to property tweens for backwards compatibility
+      emitters.property_tweener(obj, scope)
     end
 
     return

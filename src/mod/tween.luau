@@ -7,7 +7,7 @@ local Bezier = require("@obj/Bezier")
 
 local tween = {}
 
-local bezierCache: { [string]: Bezier.Bezier } = {}
+tween.bezier_cache = {} :: { [string]: Bezier.Bezier }
 
 function tween.fromParams(
   params: string,
@@ -18,7 +18,7 @@ function tween.fromParams(
   startAtZero: boolean?,
   stepAtPriority: number?
 )
-  local bezier = bezierCache[params]
+  local bezier = tween.bezier_cache[params]
 
   if not bezier then
     local success, points = pcall(function()
@@ -31,7 +31,7 @@ function tween.fromParams(
 
     -- use 0 accuracy as it saves performance because there is no need to calculate the length
     bezier = Bezier.new(points, 0)
-    bezierCache[params] = bezier
+    tween.bezier_cache[params] = bezier
   end
 
   local elapsed = 0

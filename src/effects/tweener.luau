@@ -6,10 +6,16 @@ local utility = require("@mod/utility")
 
 local rng = Random.new()
 
-local prop = {}
+local tweener = {}
 
-function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
-  local property = obj.Name
+function tweener.emit(parent: Instance, obj: RayValue, scope: types.scope, isAttribute: boolean)
+  local target = utility.getTarget(obj)
+
+  if not target then
+    return
+  end
+
+  local name = obj.Name
 
   local emitDelay = attr.get(obj, "EmitDelay", 0)
   local resetOnFinish = attr.get(obj, "ResetOnFinish", true)
@@ -20,12 +26,24 @@ function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
     task.wait(emitDelay)
   end
 
-  local endValue = obj:GetAttribute("_END_VALUE")
-  local overrideStartValue = obj:GetAttribute("_START_VALUE")
+  local endValue = attr.get(obj, "_END_VALUE", nil)
+  local overrideStartValue = attr.get(obj, "_START_VALUE", nil)
 
-  local ok, startValue = pcall(function()
-    return parent[property]
-  end)
+  local startValue
+
+  if isAttribute then
+    startValue = attr.get(target, name, nil)
+  else
+    local ok, val = pcall(function()
+      return target[name]
+    end)
+
+    if not ok then
+      return
+    end
+
+    startValue = val
+  end
 
   if overrideStartValue then
     startValue = overrideStartValue
@@ -33,7 +51,7 @@ function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
 
   local typeName = typeof(startValue)
 
-  if not ok or typeName ~= typeof(endValue) then
+  if typeName ~= typeof(endValue) then
     return
   end
 
@@ -61,17 +79,36 @@ function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
 
   local lfunc = lerp[typeName] or lerp.Other
 
+  local animator = if isAttribute
+    then function(alpha, deltaTime)
+      attr.set(target, name, lfunc(startValue, endValue, alpha))
+      return deltaTime * currentSpeed
+    end
+    else function(alpha, deltaTime)
+      target[name] = lfunc(startValue, endValue, alpha)
+      return deltaTime * currentSpeed
+    end
+
   table.insert(
     scope,
-    tween.fromParams(attr.get(obj, "Easing_Curve", utility.linear_bezier), duration, function(alpha, deltaTime)
-      parent[property] = lfunc(startValue, endValue, alpha)
-      return deltaTime * currentSpeed
-    end, speedTween, nil, nil, utility.RENDER_PRIORITY + scope.depth)
+    tween.fromParams(
+      attr.get(obj, "Easing_Curve", utility.linear_bezier),
+      duration,
+      animator,
+      speedTween,
+      nil,
+      nil,
+      utility.RENDER_PRIORITY + scope.depth
+    )
   )
 
   if resetOnFinish then
     table.insert(scope, function()
-      parent[property] = startValue
+      if isAttribute then
+        attr.set(target, name, startValue)
+      else
+        target[name] = startValue
+      end
     end)
   end
 
@@ -82,4 +119,4 @@ function prop.emit(parent: Instance, obj: RayValue, scope: types.scope)
   end, speedTween, scope)
 end
 
-return prop
+return tweener

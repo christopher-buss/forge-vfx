@@ -21,6 +21,13 @@ utility.BEZIER_TAG = "BezierParticle"
 utility.LIGHTNING_TAG = "LightningBolt"
 utility.SHOCKWAVE_TAG = "Shockwave"
 utility.SCREENSHAKE_TAG = "CameraShake"
+
+utility.PROPERTY_TWEENER_TAG = "PropertyTweener"
+utility.PROPERTY_RANDOMIZER_TAG = "PropertyRandomizer"
+
+utility.ATTRIBUTE_TWEENER_TAG = "AttributeTweener"
+utility.ATTRIBUTE_RANDOMIZER_TAG = "AttributeRandomizer"
+
 utility.ENABLED_VFX_TAG = "ConstantVFX"
 utility.TEXTURE_LOAD_TAG = "LoadVFXTextures"
 
@@ -199,6 +206,30 @@ function utility.shouldSkipNested(obj: Instance)
     or obj:HasTag(utility.LIGHTNING_TAG)
     or utility.isMeshVFX(obj)
     or (obj:IsA("BasePart") and utility.findFirstClassWithTag(obj, "Attachment", utility.SHOCKWAVE_TAG) ~= nil)
+end
+
+function utility.getTarget(obj: Instance): Instance?
+  local objectValue = obj:FindFirstChildOfClass("ObjectValue")
+
+  if objectValue and objectValue.Value then
+    return objectValue.Value
+  end
+
+  local parent = obj.Parent
+
+  if not parent then
+    return nil
+  end
+
+  while parent:IsA("Folder") do
+    parent = parent.Parent
+
+    if not parent then
+      return nil
+    end
+  end
+
+  return parent
 end
 
 function utility.createEmitPromise(effects: any, instance: Instance, effectDepth: number, emitFunc: any)
