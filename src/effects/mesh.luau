@@ -40,7 +40,8 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
   local duration = rng:NextNumber(durationRange.Min, durationRange.Max)
 
   local emitDelay = attr.get(ref, "EmitDelay", 0)
-  local emitDuration = attr.get(ref, "EmitDuration", 0, true)
+  local destroyDelay = attr.get(ref, "DestroyDelay", 0)
+  local emitDuration = attr.get(ref, "EmitDuration", 0)
 
   local legacy_isFlipbook = attr.get(ref, "Flipbook", false, true)
   local legacy_flipbookFadeOffset = attr.get(ref, "FlipbookFadeOffset", 0, true)
@@ -440,16 +441,21 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
     end
   end
 
-  tween.timer(math.max(duration, longestFlipbookDuration) + legacy_flipbookFadeOffset, function(deltaTime, elapsed)
-    local speed = attr.getState(ref, "SpeedOverride", currentSpeed)
+  tween.timer(
+    math.max(duration, longestFlipbookDuration) + legacy_flipbookFadeOffset + destroyDelay,
+    function(deltaTime, elapsed)
+      local speed = attr.getState(ref, "SpeedOverride", currentSpeed)
 
-    currentSpeed = speed
+      currentSpeed = speed
 
-    return if speed > 0
-        or (elapsed > 0 and if speedTween then speedTween.Connected else attr.getState(ref, "SpeedTweening", false))
-      then deltaTime * speed
-      else nil
-  end, speedTween, scope)
+      return if speed > 0
+          or (elapsed > 0 and if speedTween then speedTween.Connected else attr.getState(ref, "SpeedTweening", false))
+        then deltaTime * speed
+        else nil
+    end,
+    speedTween,
+    scope
+  )
 
   Promise.all(promises):await()
 
