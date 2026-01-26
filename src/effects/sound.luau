@@ -180,7 +180,7 @@ local function playSingleSound(
     )
   end
 
-  if clone.PlayOnRemove then
+  if clone.PlayOnRemove and not utility.PLUGIN_CONTEXT then
     clone:Destroy()
   else
     clone:Play()
@@ -248,6 +248,13 @@ function sound.emit(ref: Sound, scope: types.scope)
     ref:Stop()
   end
 
+  local isSource = attr.get(ref, "SoundPoolIsSource", false)
+  local inheritPoolAttributes = attr.get(ref, "SoundPoolInheritAttributes", false)
+
+  if inheritPoolAttributes then
+    ref = not isSource and selectRandomSound(ref) or ref
+  end
+
   local emitDelay = attr.get(ref, "EmitDelay", 0)
   local emitDuration = attr.get(ref, "EmitDuration", 0)
 
@@ -257,14 +264,12 @@ function sound.emit(ref: Sound, scope: types.scope)
   local repeatCount = attr.get(ref, "RepeatCount", 1)
   local repeatInterval = attr.getRange(ref, "RepeatInterval", NumberRange.new(0, 0))
 
-  local inheritPoolAttributes = attr.get(ref, "SoundPoolInheritAttributes", false)
-
   task.wait(emitDelay)
 
   local promises = {}
 
   for i = 1, emitCount do
-    local sourceSound = selectRandomSound(ref)
+    local sourceSound = inheritPoolAttributes and ref or (not isSource and selectRandomSound(ref) or ref)
 
     if not sourceSound then
       continue
