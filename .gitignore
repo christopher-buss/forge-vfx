@@ -6,3 +6,7 @@ sourcemap.json
 *.rbxm
 
 __pycache__
+
+node_modules
+.eslintcache
+dist
