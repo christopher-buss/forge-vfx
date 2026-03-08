@@ -1,0 +1,8 @@
+{
+	"extends": "@isentinel/tsconfig/roblox",
+	"compilerOptions": {
+		"typeRoots": ["${configDir}/node_modules/@rbxts", "${configDir}/node_modules/@rbxutil"],
+		"declaration": true
+	},
+	"exclude": ["node_modules", "out", "dist"]
+}
