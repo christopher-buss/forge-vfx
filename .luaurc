@@ -5,6 +5,7 @@
     "obj": "./src/obj",
     "vfx": "./src/effects",
     "srv": "./src/services",
-    "root": "./src"
+    "root": "./src",
+    "lune": "~/.lune/.typedefs/0.10.4/"
   }
 }

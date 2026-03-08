@@ -1,16 +1,8 @@
 {
+	"extends": "@isentinel/tsconfig/roblox",
 	"compilerOptions": {
-		"strict": true,
-		"target": "ESNext",
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"declaration": true,
-		"noLib": true,
-		"typeRoots": ["node_modules/@rbxts"],
-		"rootDir": ".",
-		"outDir": "out",
-		"incremental": true,
-		"tsBuildInfoFile": "out/tsconfig.tsbuildinfo"
+		"typeRoots": ["${configDir}/node_modules/@rbxts", "${configDir}/node_modules/@rbxutil"],
+		"declaration": true
 	},
-	"include": ["index.d.ts"]
+	"exclude": ["node_modules", "out", "dist"]
 }

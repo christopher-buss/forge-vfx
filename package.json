@@ -1,34 +1,64 @@
 {
-  "name": "@zilibobi/forge-vfx",
-  "version": "2.3.0",
-  "description": "The official emit module from the VFX Forge plugin used to emit visual effects in-game.",
-  "main": "out/init.luau",
-  "types": "out/index.d.ts",
-  "type": "commonjs",
-  "files": [
-    "out"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zilibobi/forge-vfx.git"
-  },
-  "homepage": "https://docs.zilibobi.dev/vfx-forge/module/installation/",
-  "author": "zilibobi",
-  "license": "VFX-DL-1.1",
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check index.d.ts",
-    "format": "biome format --write index.d.ts",
-    "format:check": "biome format index.d.ts"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.8",
-    "@rbxts/compiler-types": "^3.0.0-types.0",
-    "@rbxts/types": "^1.0.891",
-    "roblox-ts": "^3.0.0",
-    "typescript": "^5.9.3"
-  }
+	"name": "@rbxts/vfx-forge",
+	"version": "2.2.2",
+	"description": "The official emit module from the VFX Forge plugin used to emit visual effects in-game.",
+	"keywords": [
+		"rbxts",
+		"roblox",
+		"vfx",
+		"effects",
+		"particles",
+		"forge",
+		"plugin"
+	],
+	"homepage": "https://docs.zilibobi.dev/vfx-forge/",
+	"bugs": {
+		"url": "https://github.com/christopher-buss/forge-vfx/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/christopher-buss/forge-vfx.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": "zilibobi",
+	"contributors": [
+		{
+			"name": "Christopher Buss",
+			"email": "christopher.buss@pm.me",
+			"url": "https://github.com/christopher-buss"
+		}
+	],
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./out/index.d.ts",
+			"import": "./out/init.luau",
+			"default": "./out/init.luau"
+		}
+	},
+	"types": "out/index.d.ts",
+	"files": [
+		"out"
+	],
+	"scripts": {
+		"build": "lune run process",
+		"lint": "eslint --cache",
+		"lint:ci": "eslint --cache --cache-strategy content",
+		"release": "bumpp"
+	},
+	"dependencies": {
+		"@rbxutil/shake": "^1.1.0"
+	},
+	"devDependencies": {
+		"@isentinel/eslint-config": "^5.0.0-beta.8",
+		"@isentinel/tsconfig": "^1.2.0",
+		"@rbxts/compiler-types": "3.0.0-types.0",
+		"@rbxts/types": "^1.0.903",
+		"bumpp": "^10.4.0",
+		"eslint": "^9.39.2",
+		"jiti": "^2.6.1",
+		"roblox-ts": "^3.0.0",
+		"typescript": "^5.9.3"
+	},
+	"packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316"
 }
