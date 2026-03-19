@@ -50,10 +50,10 @@ function emitters.particle(
   sharedRefMap: { [Instance]: Instance },
   legacyScale: number
 )
-  local count = attr.get(obj, "EmitCount", 1, true)
+  local count = attr.get(obj, "EmitCount", utility.PLUGIN_CONTEXT and 1 or nil)
   local duration = attr.get(obj, "EmitDuration", 0, true)
 
-  if count <= 0 and duration <= 0 then
+  if not count or (count <= 0 and duration <= 0) then
     return
   end
 
