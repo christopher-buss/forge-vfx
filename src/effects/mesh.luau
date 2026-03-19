@@ -74,7 +74,7 @@ function mesh.emit(ref: Model, obj: BasePart, scope: types.scope, scale: number,
   local useEmitDuration = ref:GetAttribute("Enabled") ~= nil and ref:HasTag(utility.ENABLED_VFX_TAG) and duration > 0
 
   local legacy_decalST = attr.get(ref, "Decal_StartTransparency", 0, true)
-  local legacy_decalET = attr.get(ref, "Decal_EndTransparency", 0, true)
+  local legacy_decalET = attr.get(ref, "Decal_EndTransparency", 1, true)
 
   local partDefaultTp = 0
 
