@@ -6,3 +6,9 @@ sourcemap.json
 *.rbxm
 
 __pycache__
+
+/node_modules
+/out
+*.tsbuildinfo
+
+bun.lock

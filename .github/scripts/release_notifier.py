@@ -66,10 +66,11 @@ def send_discord_webhook(
     )
     wally_code = 'ForgeVFX = "{0}@{1}"'.format(wally_package, release.version)
 
-    links_value = (
-        "[GitHub Release]({0})\n[Wally Package]({1})\n[Full Changelog]({2})".format(
-            release.release_url, release.wally_url, release.compare_url
-        )
+    npm_url = "https://www.npmjs.com/package/@zilibobi/forge-vfx/v/{0}".format(
+        release.version
+    )
+    links_value = "[GitHub Release]({0})\n[Wally Package]({1})\n[NPM Package]({2})\n[Full Changelog]({3})".format(
+        release.release_url, release.wally_url, npm_url, release.compare_url
     )
 
     truncation_msg = (
@@ -106,6 +107,11 @@ def send_discord_webhook(
     embed.add_embed_field(
         name="Wally Installation",
         value="```toml\n{0}\n```".format(wally_code),
+        inline=False,
+    )
+    embed.add_embed_field(
+        name="NPM Installation",
+        value="```sh\nnpm i @zilibobi/forge-vfx@{0}\n```".format(release.version),
         inline=False,
     )
     embed.add_embed_field(name="Links", value=links_value, inline=False)

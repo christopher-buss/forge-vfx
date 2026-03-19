@@ -14,10 +14,16 @@ The emit module is licensed under a custom source-available copyleft license whi
 
 ## Installation
 
-#### Using Wally
+#### Wally
 
 ```sh
 ForgeVFX = "zilibobi/forge-vfx@2.2.2"
+```
+
+#### TypeScript
+
+```sh
+npm i @zilibobi/forge-vfx@latest
 ```
 
 #### Manual
