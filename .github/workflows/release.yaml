@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Setup JS
-        uses: sxzz/workflows/setup-js@v1
+        uses: sxzz/workflows/setup-js@69098296b6f6083ed99f38e2040f2a7238580e27 # v1.4.0
         with:
           fetch-all: true
 
       - name: Install Rokit
-        uses: CompeyDev/setup-rokit@v0.1.2
+        uses: CompeyDev/setup-rokit@d49be92bd9502180218c3f43e7988faa945217b0 # v0.1.2
 
       - name: Darklua Process
         run: lune run .lune/process.luau
