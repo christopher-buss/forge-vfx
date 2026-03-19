@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,7 +64,7 @@ jobs:
           mkdir -p out
           cp "forge-vfx@${CURRENT_TAG}.rbxm" out/ForgeVFX.rbxm
           cp index.d.ts out/index.d.ts
-          echo 'return require(script.ForgeVFX)' > out/init.lua
+          echo 'return require(script.ForgeVFX)' > out/init.luau
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -71,11 +72,12 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Publish to npm
         continue-on-error: true
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance
 
       - name: Setup Python
         uses: actions/setup-python@v5
