@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/vfx-forge",
-	"version": "2.2.2-ts.1",
+	"version": "2.2.0-ts.1",
 	"description": "The official emit module from the VFX Forge plugin used to emit visual effects in-game.",
 	"keywords": [
 		"rbxts",

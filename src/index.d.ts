@@ -90,15 +90,15 @@ export interface EmitEnvironment {
  */
 export interface Api {
 	/**
-	 * Caches attributes for a VFX object. Client-side only. Use with
-	 * `restoreAttributes` to save/restore original attribute values.
+	 * Caches attributes for a VFX object's descendants. Client-side only. Use
+	 * with `restoreAttributes` to save/restore original attribute values.
 	 *
-	 * @param object - Instance whose attributes to cache.
+	 * @param object - Root instance whose descendant attributes to cache.
 	 */
 	cacheAttributes: (object: Instance) => void;
 
 	/** Internal caches used by the VFX system. */
-	caches: ApiCaches;
+	caches?: ApiCaches;
 
 	/**
 	 * Clean up and shut down Forge VFX. Destroys all caches, cleans up scopes,
@@ -107,9 +107,11 @@ export interface Api {
 	deinit: () => void;
 
 	/**
-	 * Disables a ParticleEmitter, Beam, or VFX object.
+	 * Disables a VFX instance and all its descendants. For ParticleEmitters and
+	 * Beams, sets the Enabled property directly. For other instances, sets the
+	 * "Enabled" attribute.
 	 *
-	 * @param object - Instance to disable.
+	 * @param object - Instance to disable (propagates to descendants).
 	 */
 	disable: (object: Instance) => void;
 
@@ -135,7 +137,7 @@ export interface Api {
 		/**
 		 * Emit effects at default scale (1).
 		 *
-		 * @param instances - One or more Roblox instances to emit effects from.
+		 * @param instances - Roblox instances to emit effects from.
 		 * @returns Environment with a Finished promise that resolves when
 		 *   complete.
 		 */
@@ -166,9 +168,11 @@ export interface Api {
 	) => EmitEnvironment;
 
 	/**
-	 * Enables a ParticleEmitter, Beam, or VFX object.
+	 * Enables a VFX instance and all its descendants. For ParticleEmitters and
+	 * Beams, sets the Enabled property directly. For other instances, sets the
+	 * "Enabled" attribute.
 	 *
-	 * @param object - Instance to enable.
+	 * @param object - Instance to enable (propagates to descendants).
 	 */
 	enable: (object: Instance) => void;
 
@@ -181,11 +185,46 @@ export interface Api {
 	init: (parameters?: object) => void;
 
 	/**
-	 * Restores previously cached attributes for a VFX object. Client-side only.
+	 * Recolor VFX instances. In "replace" mode, sets all colors to the given
+	 * color (preserving HDR factor). In "multiply" mode, blends the color with
+	 * existing colors via HSV multiplication. Skips BasePart descendants (only
+	 * applies to directly passed BaseParts).
 	 *
-	 * @param object - Instance whose attributes to restore.
+	 * @param color - The target color.
+	 * @param mode - "replace" to set colors directly, "multiply" to blend with
+	 *   existing.
+	 * @param instances - One or more instances to recolor (includes
+	 *   descendants).
+	 */
+	recolor: (color: Color3, mode: "multiply" | "replace", ...instances: Array<Instance>) => void;
+
+	/**
+	 * Scale the size of VFX instances by a factor. Adjusts particle sizes, beam
+	 * widths, attachment distances, and more.
+	 *
+	 * @param factor - The size scale factor.
+	 * @param instances - One or more instances to resize (includes
+	 *   descendants).
+	 */
+	resize: (factor: number, ...instances: Array<Instance>) => void;
+
+	/**
+	 * Restores previously cached attributes for a VFX object's descendants.
+	 * Client-side only.
+	 *
+	 * @param object - Root instance whose descendant attributes to restore.
 	 */
 	restoreAttributes: (object: Instance) => void;
+
+	/**
+	 * Scale the timing of VFX instances by a factor. Adjusts speeds, lifetimes,
+	 * durations, and rates across all effect types.
+	 *
+	 * @param factor - The time scale factor (>1 speeds up, <1 slows down).
+	 * @param instances - One or more instances to retime (includes
+	 *   descendants).
+	 */
+	retime: (factor: number, ...instances: Array<Instance>) => void;
 
 	/** Current active scope stack for cleanup management. */
 	scope: Array<unknown>;
@@ -330,9 +369,9 @@ declare class Cache {
 	 * Retrieves an item without creating it if missing.
 	 *
 	 * @param key - Key to look up.
-	 * @returns The cached instance, or undefined if not found.
+	 * @returns The cached item, or undefined if not found.
 	 */
-	public peek: (key: unknown) => Instance | undefined;
+	public peek: (key: unknown) => Item | undefined;
 
 	/**
 	 * Creates a new cache.
